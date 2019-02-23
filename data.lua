@@ -4,7 +4,7 @@ data:extend({
     name = "mirv-item",
     icon = "__MIRV__/mirv_item.png",
     icon_size = 32,
-    flags = {"goes-to-quickbar"},
+    flags = {},
     subgroup = "capsule",
     order = "z[MIRV]",
     place_result = "mirv-entity",
@@ -15,7 +15,7 @@ data:extend({
     name = "mirv-rocket",
     icon = "__MIRV__/mirv_rocket.png",
     icon_size = 32,
-    flags = {"goes-to-quickbar"},
+    flags = {},
     subgroup = "defensive-structure",
     order = "z[MIRV]",
     stack_size = 1,
@@ -82,7 +82,7 @@ data:extend({
     movement_slow_down_factor = 1,
     color = {r = 1, g = 1, b = 1},
     render_layer = "lower-object",
-    animation = 
+    animation =
     {
       width = 624,
       height = 440,
@@ -111,7 +111,7 @@ data:extend({
     movement_slow_down_factor = 1,
     color = {r = 1, g = 1, b = 1},
     render_layer = "lower-object",
-    animation = 
+    animation =
     {
       width = 800,
       height = 565,
@@ -143,7 +143,7 @@ data:extend({
       width = 1,
       height = 1
     },
-    build_sound = 
+    build_sound =
     {
       filename = "__MIRV__/launch-sound.ogg",
       volume = 1
@@ -167,12 +167,12 @@ data:extend({
       count = 10000,
       ingredients =
       {
-        {"science-pack-1", 1},
-        {"science-pack-2", 1},
-        {"science-pack-3", 1},
+        {"automation-science-pack", 1},
+        {"logistic-science-pack", 1},
+        {"chemical-science-pack", 1},
         {"military-science-pack", 1},
         {"production-science-pack", 1},
-        {"high-tech-science-pack", 1}
+        {"utility-science-pack", 1}
       },
       time = 45
     },
