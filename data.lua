@@ -270,6 +270,12 @@ local ammo =
   stack_size = 10
 }
 
+local nested_projectile = util.copy(data.raw["artillery-projectile"]["artillery-projectile"])
+nested_projectile.name = "mirv-nuke-projectile"
+nested_projectile.order = "ASEOASKO"
+nested_projectile.picture = util.empty_sprite()
+nested_projectile.shadow = nil
+
 local projectile =
 {
   type = "artillery-projectile",
@@ -293,18 +299,51 @@ local projectile =
             type = "area",
             target_entities = false,
             trigger_from_target = true,
+            repeat_count = 50,
+            radius = 10,
+            action_delivery =
+            {
+              type = "instant",
+              target_effects =
+              {
+                {
+                  type = "create-entity",
+                  entity_name = "big-artillery-explosion"
+                },
+                {
+                  type = "create-trivial-smoke",
+                  smoke_name = "artillery-smoke",
+                  initial_height = 0,
+                  speed = {0, -1},
+                  speed_from_center = 0.05,
+                  speed_from_center_deviation = 0.005,
+                  offset_deviation = {{-4, -4}, {4, 4}},
+                  max_radius = 3.5,
+                  repeat_count = 4 * 4 * 15
+                },
+              }
+            }
+          }
+        },
+        {
+          type = "nested-result",
+          action =
+          {
+            type = "area",
+            target_entities = false,
+            trigger_from_target = true,
             repeat_count = 2000,
             radius = 100,
             action_delivery =
             {
               type = "artillery",
-              projectile = "artillery-projectile",
+              projectile = "mirv-nuke-projectile",
               starting_speed = 0.75,
               starting_speed_deviation = 0.01,
               direction_deviation = 0,
               range_deviation = 0.5
             }
-          }
+          },
         },
         --{
         --  type = "show-explosion-on-chart",
@@ -337,15 +376,20 @@ local projectile =
     }
   },
   light = {intensity = 0.8, size = 15},
-  animation =
+  picture =
   {
-    filename = "__base__/graphics/entity/rocket/rocket.png",
-    frame_count = 8,
-    line_length = 8,
-    width = 9,
-    height = 35,
-    shift = {0, 0},
-    priority = "high"
+    filename = "__base__/graphics/entity/rocket-silo/02-rocket.png",
+    width = 154,
+    height = 300,
+    scale = 0.5,
+    shift = util.by_pixel(-4, -28),
+    hr_version = {
+      filename = "__base__/graphics/entity/rocket-silo/hr-02-rocket.png",
+      width = 310,
+      height = 596,
+      shift = util.by_pixel(-5, -27),
+      scale = 0.25
+    }
   },
   shadow =
   {
@@ -434,6 +478,7 @@ data:extend
   gun,
   ammo,
   projectile,
+  nested_projectile,
   remote,
   flare
 
