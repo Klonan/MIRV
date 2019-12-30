@@ -1,15 +1,6 @@
+local util = require("tf_util/tf_util")
+
 data:extend({
-  {
-    type = "item",
-    name = "mirv-item",
-    icon = "__MIRV__/mirv_item.png",
-    icon_size = 32,
-    flags = {},
-    subgroup = "capsule",
-    order = "z[MIRV]",
-    place_result = "mirv-entity",
-    stack_size = 50
-  },
   {
     type = "item",
     name = "mirv-rocket",
@@ -19,7 +10,6 @@ data:extend({
     subgroup = "defensive-structure",
     order = "z[MIRV]",
     stack_size = 1,
-    rocket_launch_product = {"mirv-item", 5}
   },
   {
     type = "recipe",
@@ -79,7 +69,7 @@ data:extend({
     end_scale = 1,
     cyclic = true,
     affected_by_wind = false,
-    movement_slow_down_factor = 1,
+    movement_slow_down_factor = 0,
     color = {r = 1, g = 1, b = 1},
     render_layer = "lower-object",
     animation =
@@ -108,7 +98,7 @@ data:extend({
     end_scale = 1,
     cyclic = true,
     affected_by_wind = false,
-    movement_slow_down_factor = 1,
+    movement_slow_down_factor = 0,
     color = {r = 1, g = 1, b = 1},
     render_layer = "lower-object",
     animation =
@@ -179,3 +169,272 @@ data:extend({
     order = "e-a-c"
   }
 })
+
+local turret =
+{
+  type = "artillery-turret",
+  name = "mirv-launcher",
+  icon = "__base__/graphics/icons/artillery-turret.png",
+  icon_size = 64, icon_mipmaps = 4,
+  flags = {"placeable-neutral", "placeable-player", "player-creation"},
+
+  --collision_box = {{-1.45, -1.45}, {1.45, 1.45}},
+  --selection_box = {{-1.5, -1.5}, {1.5, 1.5}},
+  collision_mask = {},
+
+  inventory_size = 1,
+  ammo_stack_limit = 5,
+  automated_ammo_count = 1,
+  gun = "mirv-launcher-gun",
+  turret_rotation_speed = 1,
+  manual_range_modifier = 1000000,
+  disable_automatic_firing = false,
+
+  base_picture = util.empty_sprite(),
+  cannon_barrel_pictures = util.empty_sprite(),
+  cannon_base_pictures = util.empty_sprite(),
+  order = "lol",
+  alert_when_attacking = false
+
+}
+
+local gun =
+{
+  type = "gun",
+  name = "mirv-launcher-gun",
+  icon = "__base__/graphics/icons/tank-cannon.png",
+  icon_size = 64, icon_mipmaps = 4,
+  flags = {"hidden"},
+  subgroup = "gun",
+  order = "z[artillery]-a[cannon]",
+  attack_parameters =
+  {
+    type = "projectile",
+    ammo_category = util.ammo_category("mirv-launcher"),
+    cooldown = 15 * 60,
+    movement_slow_down_factor = 0,
+    range = 1000
+  },
+  stack_size = 1
+}
+
+local ammo =
+{
+  type = "ammo",
+  name = "mirv-ammo",
+  icon = "__base__/graphics/icons/atomic-bomb.png",
+  icon_size = 64, icon_mipmaps = 4,
+  ammo_type =
+  {
+    target_type = "position",
+    category = util.ammo_category("mirv-launcher"),
+    action =
+    {
+      type = "direct",
+      action_delivery =
+      {
+        type = "instant",
+        target_effects =
+        {
+
+          {
+            type = "script",
+            effect_id = "mirv-launch"
+          },
+          {
+            type = "nested-result",
+            action =
+            {
+              type = "area",
+              radius = 120,
+              target_entities = false,
+              action_delivery =
+              {
+                type = "instant",
+                target_effects =
+                {
+                  {
+                    type = "damage",
+                    damage = {amount = 0 , type = "physical"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  subgroup = "ammo",
+  order = "d[rocket-launcher]-c[atomic-bomb]",
+  stack_size = 10
+}
+
+local projectile =
+{
+  type = "artillery-projectile",
+  name = "mirv-projectile",
+  flags = {"not-on-map"},
+  acceleration = 0.01,
+  reveal_map = false,
+  map_color = {r = 0, g = 1, b = 0},
+  action =
+  {
+    type = "direct",
+    action_delivery =
+    {
+      type = "instant",
+      target_effects =
+      {
+        {
+          type = "nested-result",
+          action =
+          {
+            type = "area",
+            target_entities = false,
+            trigger_from_target = true,
+            repeat_count = 2000,
+            radius = 100,
+            action_delivery =
+            {
+              type = "artillery",
+              projectile = "artillery-projectile",
+              starting_speed = 1,
+              starting_speed_deviation = 0.01,
+              direction_deviation = 0,
+              range_deviation = 0.5
+            }
+          }
+        },
+        --{
+        --  type = "show-explosion-on-chart",
+        --  scale = 35/32
+        --}
+      }
+    }
+  },
+  chart_picture =
+  {
+    layers =
+    {
+
+      {
+        filename = "__base__/graphics/entity/artillery-projectile/artillery-shoot-map-visualization.png",
+        flags = { "icon" },
+        frame_count = 1,
+        width = 64,
+        height = 64,
+        priority = "high",
+        scale = 1
+      },
+      {
+        filename = "__MIRV__/mirv_rocket.png",
+        width = 32,
+        height = 32,
+        scale = 0.5,
+        frame_count = 1
+      }
+    }
+  },
+  light = {intensity = 0.8, size = 15},
+  animation =
+  {
+    filename = "__base__/graphics/entity/rocket/rocket.png",
+    frame_count = 8,
+    line_length = 8,
+    width = 9,
+    height = 35,
+    shift = {0, 0},
+    priority = "high"
+  },
+  shadow =
+  {
+    filename = "__base__/graphics/entity/rocket/rocket-shadow.png",
+    frame_count = 1,
+    width = 7,
+    height = 24,
+    priority = "high",
+    shift = {0, 0}
+  },
+  smoke =
+  {
+    {
+      name = "smoke-fast",
+      deviation = {0.15, 0.15},
+      frequency = 1,
+      position = {0, 1},
+      slow_down_factor = 1,
+      starting_frame = 3,
+      starting_frame_deviation = 5,
+      starting_frame_speed = 0,
+      starting_frame_speed_deviation = 5
+    }
+  }
+}
+
+local remote =
+{
+  type = "capsule",
+  name = "mirv-targeting-remote",
+  localise_name = "MIRV targetting remote",
+  icon = "__base__/graphics/icons/artillery-targeting-remote.png",
+  icon_size = 64, icon_mipmaps = 4,
+  capsule_action =
+  {
+    type = "artillery-remote",
+    flare = "mirv-flare"
+  },
+  subgroup = "capsule",
+  order = "zz",
+  stack_size = 1
+}
+
+local flare =
+{
+  type = "artillery-flare",
+  name = "mirv-flare",
+  icon = "__base__/graphics/icons/artillery-targeting-remote.png",
+  icon_size = 64, icon_mipmaps = 4,
+  flags = {"placeable-off-grid", "not-on-map"},
+  map_color = {r=1, g=0.5, b=0},
+  life_time = 60 * 60,
+  initial_height = 0,
+  initial_vertical_speed = 0,
+  initial_frame_speed = 1,
+  shots_per_flare = 1,
+  early_death_ticks = 3 * 60,
+  shot_category = util.ammo_category("mirv-launcher"),
+  pictures =
+  {
+    {
+      filename = "__core__/graphics/shoot-cursor-red.png",
+      priority = "low",
+      width = 258,
+      height = 183,
+      frame_count = 1,
+      scale = 1,
+      flags = {"icon"}
+    },
+    --{
+    --  filename = "__base__/graphics/entity/sparks/sparks-02.png",
+    --  width = 36,
+    --  height = 32,
+    --  frame_count = 19,
+    --  line_length = 19,
+    --  shift = {0.03125, 0.125},
+    --  tint = { r = 1.0, g = 0.9, b = 0.0, a = 1.0 },
+    --  animation_speed = 0.3,
+    --}
+  }
+}
+
+data:extend
+{
+  turret,
+  gun,
+  ammo,
+  projectile,
+  remote,
+  flare
+
+}

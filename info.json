@@ -1,10 +1,10 @@
 {
   "name": "MIRV",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "title": "M.I.R.V",
   "author": "Klonan",
   "contact": "",
   "homepage": "",
   "description": "Launch a M.I.R.V into orbit, then call it down for mass destruction",
-  "factorio_version": "0.17"
+  "factorio_version": "0.18"
 }
