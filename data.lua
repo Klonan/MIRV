@@ -299,7 +299,7 @@ local projectile =
             {
               type = "artillery",
               projectile = "artillery-projectile",
-              starting_speed = 1,
+              starting_speed = 0.75,
               starting_speed_deviation = 0.01,
               direction_deviation = 0,
               range_deviation = 0.5
