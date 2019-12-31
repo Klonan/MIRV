@@ -11,6 +11,7 @@ local launcher = "mirv-launcher"
 local insert_param = {name = "mirv-ammo", count = 5}
 local mirv_effect_id = "mirv-launch"
 local mirv_projectile = "mirv-projectile"
+local mirv_pollution_trigger = "mirv-pollute"
 
 local make_mirv_launcher = function(silo)
   local launcher = silo.surface.create_entity
@@ -46,9 +47,8 @@ local add_to_tracked_items = function()
 
 end
 
-local on_script_trigger_effect = function(event)
-  if event.effect_id ~= mirv_effect_id then return end
-  --game.print(serpent.block(event)..math.random())
+local mirv_script_trigger = function(event)
+
   local source = event.source_entity
   if not (source and source.valid) then
     return
@@ -58,6 +58,15 @@ local on_script_trigger_effect = function(event)
   if not position then return end
 
   local surface = source.surface
+
+  local flares = surface.find_entities_filtered{name = "mirv-flare", position = position}
+  for k, flare in pairs (flares) do
+    flare.destroy()
+    --game.print("Killed flare "..k)
+  end
+
+
+  --position = {x = 16 + (32 * math.floor(position.x / 32)), y = 16 + (32 * math.floor(position.y / 32))}
 
   surface.request_to_generate_chunks(position, 5)
   --surface.force_generate_chunk_requests()
@@ -94,12 +103,6 @@ local on_script_trigger_effect = function(event)
 
   surface.play_sound(alert_sound)
 
-  local flares = surface.find_entities_filtered{name = "mirv-flare", position = position}
-  for k, flare in pairs (flares) do
-    flare.destroy()
-    --game.print("Killed flare "..k)
-  end
-
   surface.create_trivial_smoke{name = mirv_smoke, position = position}
   surface.create_trivial_smoke{name = mirv_smoke_2, position = position}
 
@@ -110,6 +113,29 @@ local on_script_trigger_effect = function(event)
     source.destructible = false
     source.destroy()
 
+  end
+
+end
+
+local mirv_pollute_trigger = function(event)
+  local position = event.target_position
+  if not position then return end
+  local surface = game.get_surface(event.surface_index)
+  if not surface then return end
+
+  surface.pollute(position, 1000)
+  game.pollution_statistics.on_flow(launcher, 1000)
+end
+
+local on_script_trigger_effect = function(event)
+  if event.effect_id == mirv_effect_id then
+    mirv_script_trigger(event)
+    return
+  end
+
+  if event.effect_id == mirv_pollution_trigger then
+    mirv_pollute_trigger(event)
+    return
   end
 
 end

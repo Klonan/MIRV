@@ -149,7 +149,11 @@ data:extend({
       {
         type = "unlock-recipe",
         recipe = "mirv-rocket"
-      }
+      },
+      {
+        type = "unlock-recipe",
+        recipe = "mirv-targeting-remote"
+      },
     },
     prerequisites = {"rocket-silo", "atomic-bomb"},
     unit =
@@ -223,7 +227,7 @@ local ammo =
   type = "ammo",
   name = "mirv-ammo",
   icon = "__base__/graphics/icons/atomic-bomb.png",
-  icon_size = 64, icon_mipmaps = 4,
+  icon_size = 1, icon_mipmaps = 1,
   ammo_type =
   {
     target_type = "position",
@@ -270,11 +274,259 @@ local ammo =
   stack_size = 10
 }
 
-local nested_projectile = util.copy(data.raw["artillery-projectile"]["artillery-projectile"])
-nested_projectile.name = "mirv-nuke-projectile"
-nested_projectile.order = "ASEOASKO"
-nested_projectile.picture = util.empty_sprite()
-nested_projectile.shadow = nil
+local nuke_target_effects =
+{
+  {
+    type = "nested-result",
+    action =
+    {
+      type = "area",
+      target_entities = false,
+      trigger_from_target = true,
+      repeat_count = 50,
+      radius = 10,
+      action_delivery =
+      {
+        type = "instant",
+        target_effects =
+        {
+          {
+            type = "create-entity",
+            entity_name = "nuke-explosion"
+          }
+        }
+      }
+    }
+  },
+  {
+    type = "script",
+    effect_id = "mirv-pollute"
+  }
+}
+
+local do_whacka_do = function()
+  local watra = 1 + ((math.random() - 0.5))
+  return
+  {
+    filename = "__base__/graphics/entity/bigass-explosion/hr-bigass-explosion-36f.png",
+    flags = { "compressed" },
+    animation_speed = 0.5 * watra,
+    width = 324,
+    height = 416,
+    frame_count = 36,
+    shift = util.by_pixel(0, -48),
+    scale = 1 / watra,
+    stripes =
+    {
+      {
+        filename = "__base__/graphics/entity/bigass-explosion/hr-bigass-explosion-36f-1.png",
+        width_in_frames = 6,
+        height_in_frames = 3
+      },
+      {
+        filename = "__base__/graphics/entity/bigass-explosion/hr-bigass-explosion-36f-2.png",
+        width_in_frames = 6,
+        height_in_frames = 3
+      }
+    }
+  }
+end
+
+local nuke_explosion =
+{
+  type = "explosion",
+  name = "nuke-explosion",
+  flags = {"not-on-map"},
+  animations =
+  {
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+    do_whacka_do(), do_whacka_do(), do_whacka_do(),
+  },
+  light = {intensity = 1, size = 50, color = {r=1.0, g=1.0, b=1.0}},
+  sound =
+  {
+    aggregation =
+    {
+      max_count = 2,
+      remove = true
+    },
+    variations =
+    {
+      {
+        filename = "__base__/sound/fight/large-explosion-1.ogg",
+        volume = 1.0
+      },
+      {
+        filename = "__base__/sound/fight/large-explosion-2.ogg",
+        volume = 1.0
+      }
+    }
+  }
+}
+
+local fire_util = require("tf_util/tf_fire_util")
+local fiery_particle =
+{
+  type = "optimized-particle",
+  name = "fiery-particle",
+  life_time = 100,
+  movement_modifier = 0,
+  pictures = fire_util.create_fire_pictures{scale = 2}
+}
+
+
+data:extend{fiery_particle}
+
+local scorchmark =
+{
+  type = "corpse",
+  name = "nuke-scorchmark",
+  icon = "__base__/graphics/icons/small-scorchmark.png",
+  icon_size = 64, icon_mipmaps = 4,
+  flags = {"placeable-neutral", "not-on-map", "placeable-off-grid"},
+  collision_box = {{-1.5, -1.5}, {1.5, 1.5}},
+  collision_mask = {"doodad-layer", "not-colliding-with-itself"},
+  selection_box = {{-1, -1}, {1, 1}},
+  selectable_in_game = false,
+  time_before_removed = 60 * 60 * 5,
+  final_render_layer = "ground-patch-higher2",
+  subgroup = "remnants",
+  order="d[remnants]-b[scorchmark]-a[small]",
+  remove_on_entity_placement = false,
+  remove_on_tile_placement = true,
+  animation = fire_util.create_burnt_patch_pictures()
+}
+
+data:extend{scorchmark}
+
+local pictures = fire_util.create_fire_pictures({scale = 3, shift = {0, 3}})
+
+
+
+local total = #pictures
+local proj_count = math.ceil(2000 / total)
+for k, picture in pairs (pictures) do
+
+  local effect =
+  {
+    type = "nested-result",
+    action =
+    {
+      {
+
+        type = "area",
+        target_entities = false,
+        trigger_from_target = true,
+        repeat_count = proj_count,
+        radius = 100,
+        action_delivery =
+        {
+          type = "artillery",
+          projectile = "mirv-nuke-projectile"..k,
+          starting_speed = 0.75,
+          starting_speed_deviation = 0.2,
+          direction_deviation = 0,
+          range_deviation = 0.5
+        }
+      }
+    }
+  }
+
+  table.insert(nuke_target_effects, effect)
+
+  local nested_projectile =
+  {
+    type = "artillery-projectile",
+    name = "mirv-nuke-projectile"..k,
+    flags = {"not-on-map"},
+    map_color = {1, 1, 1},
+    reveal_map = true,
+    picture = picture,
+    chart_picture =
+    {
+      filename = "__base__/graphics/entity/artillery-projectile/artillery-shoot-map-visualization.png",
+      flags = { "icon" },
+      frame_count = 1,
+      width = 64,
+      height = 64,
+      priority = "high",
+      scale = math.random(20, 30) / 100
+    },
+    action =
+    {
+      type = "direct",
+      action_delivery =
+      {
+        type = "instant",
+        target_effects =
+        {
+          {
+            type = "nested-result",
+            action =
+            {
+              type = "area",
+              radius = 10.0,
+              action_delivery =
+              {
+                type = "instant",
+                target_effects =
+                {
+                  {
+                    type = "damage",
+                    damage = {amount = 2000 , type = "physical"}
+                  }
+                }
+              }
+            }
+          },
+          {
+
+            type = "create-particle",
+            repeat_count = 1,
+            particle_name = "fiery-particle",
+            initial_height = 0.1,
+            --speed_from_center = 0.08,
+            --speed_from_center_deviation = 0.1,
+            offset_deviation = {{-3, -3}, {3,3}}
+            --initial_vertical_speed = 0.18,
+            --initial_vertical_speed_deviation = 0.15,
+
+          },
+          {
+            type = "show-explosion-on-chart",
+            scale = math.random(6, 12)/32
+          },
+          {
+            type = "create-entity",
+            entity_name = "nuke-explosion"
+          },
+          --{
+          --  type = "create-entity",
+          --  entity_name = "nuke-scorchmark",
+          --  offset_deviation = {{-4, -4},{4, 4}}
+          --},
+        }
+      }
+    }
+  }
+  data:extend{nested_projectile}
+end
 
 local projectile =
 {
@@ -290,66 +542,7 @@ local projectile =
     action_delivery =
     {
       type = "instant",
-      target_effects =
-      {
-        {
-          type = "nested-result",
-          action =
-          {
-            type = "area",
-            target_entities = false,
-            trigger_from_target = true,
-            repeat_count = 50,
-            radius = 10,
-            action_delivery =
-            {
-              type = "instant",
-              target_effects =
-              {
-                {
-                  type = "create-entity",
-                  entity_name = "big-artillery-explosion"
-                },
-                {
-                  type = "create-trivial-smoke",
-                  smoke_name = "artillery-smoke",
-                  initial_height = 0,
-                  speed = {0, -1},
-                  speed_from_center = 0.05,
-                  speed_from_center_deviation = 0.005,
-                  offset_deviation = {{-4, -4}, {4, 4}},
-                  max_radius = 3.5,
-                  repeat_count = 4 * 4 * 15
-                },
-              }
-            }
-          }
-        },
-        {
-          type = "nested-result",
-          action =
-          {
-            type = "area",
-            target_entities = false,
-            trigger_from_target = true,
-            repeat_count = 2000,
-            radius = 100,
-            action_delivery =
-            {
-              type = "artillery",
-              projectile = "mirv-nuke-projectile",
-              starting_speed = 0.75,
-              starting_speed_deviation = 0.01,
-              direction_deviation = 0,
-              range_deviation = 0.5
-            }
-          },
-        },
-        --{
-        --  type = "show-explosion-on-chart",
-        --  scale = 35/32
-        --}
-      }
+      target_effects = nuke_target_effects
     }
   },
   chart_picture =
@@ -399,20 +592,6 @@ local projectile =
     height = 24,
     priority = "high",
     shift = {0, 0}
-  },
-  smoke =
-  {
-    {
-      name = "smoke-fast",
-      deviation = {0.15, 0.15},
-      frequency = 1,
-      position = {0, 1},
-      slow_down_factor = 1,
-      starting_frame = 3,
-      starting_frame_deviation = 5,
-      starting_frame_speed = 0,
-      starting_frame_speed_deviation = 5
-    }
   }
 }
 
@@ -420,7 +599,6 @@ local remote =
 {
   type = "capsule",
   name = "mirv-targeting-remote",
-  localise_name = "MIRV targetting remote",
   icon = "__base__/graphics/icons/artillery-targeting-remote.png",
   icon_size = 64, icon_mipmaps = 4,
   capsule_action =
@@ -472,14 +650,28 @@ local flare =
   }
 }
 
+local remote_recipe =
+{
+  type = "recipe",
+  name = "mirv-targeting-remote",
+  enabled = false,
+  ingredients =
+  {
+    {"processing-unit", 1},
+    {"radar", 1}
+  },
+  result = "mirv-targeting-remote"
+}
+
 data:extend
 {
   turret,
   gun,
   ammo,
   projectile,
-  nested_projectile,
   remote,
-  flare
+  flare,
+  remote_recipe,
+  nuke_explosion
 
 }

@@ -8,7 +8,8 @@ fire_util.create_fire_pictures = function(opts)
   local fire_scale =  opts.scale or 1
   local fire_tint = opts.tint or {r=1,g=1,b=1,a=1}
   local fire_flags = opts.flags or { "compressed" }
-  return 
+  local fire_shift = opts.shift or {0,0}
+  return
   {
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-13.png",
@@ -23,7 +24,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.0390625, -0.90625 }
+      shift = fire_shift, --{ -0.0390625, -0.90625 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-12.png",
@@ -38,7 +39,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.015625, -0.914065 }
+      shift = fire_shift, --{ -0.015625, -0.914065 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-11.png",
@@ -53,7 +54,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.0078125, -0.90625 }
+      shift = fire_shift, --{ -0.0078125, -0.90625 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-10.png",
@@ -68,7 +69,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.0625, -0.64844 }
+      shift = fire_shift, --{ -0.0625, -0.64844 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-09.png",
@@ -83,7 +84,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.03125, -0.695315 }
+      shift = fire_shift, --{ -0.03125, -0.695315 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-08.png",
@@ -98,7 +99,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.0546875, -0.77344 }
+      shift = fire_shift, --{ -0.0546875, -0.77344 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-07.png",
@@ -113,7 +114,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { 0.015625, -0.640625 }
+      shift = fire_shift, --{ 0.015625, -0.640625 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-06.png",
@@ -128,7 +129,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { 0, -0.83594 }
+      shift = fire_shift, --{ 0, -0.83594 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-05.png",
@@ -143,7 +144,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { 0.03125, -0.882815 }
+      shift = fire_shift, --{ 0.03125, -0.882815 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-04.png",
@@ -158,7 +159,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { 0.015625, -1.109375 }
+      shift = fire_shift, --{ 0.015625, -1.109375 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-03.png",
@@ -173,7 +174,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { 0.046875, -0.984375 }
+      shift = fire_shift, --{ 0.046875, -0.984375 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-02.png",
@@ -188,7 +189,7 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { 0.0078125, -0.96875 }
+      shift = fire_shift, --{ 0.0078125, -0.96875 }
     },
     {
       filename = "__base__/graphics/entity/fire-flame/fire-flame-01.png",
@@ -203,9 +204,46 @@ fire_util.create_fire_pictures = function(opts)
       scale = fire_scale,
       tint = fire_tint,
       flags = fire_flags,
-      shift = { -0.0703125, -1.039065 }
+      shift = fire_shift, --{ -0.0703125, -1.039065 }
     },
   }
+end
+
+
+fire_util.create_burnt_patch_pictures = function()
+  local base =
+  {
+    filename = "__base__/graphics/entity/fire-flame/burnt-patch.png",
+    line_length = 3,
+    width = 115,
+    height = 56,
+    frame_count = 9,
+    axially_symmetrical = false,
+    direction_count = 1,
+    shift = {-0.09375, 0.125},
+    tint = {0, 0, 0, 0.3}
+  }
+
+  local variations = {}
+
+  for y=1,(base.frame_count / base.line_length) do
+    for x=1,base.line_length do
+      table.insert(variations,
+      {
+        filename = base.filename,
+        width = base.width,
+        height = base.height,
+        tint = base.tint,
+        shift = base.shift,
+        x = (x-1) * base.width,
+        y = (y-1) * base.height,
+        direction_count = 1,
+        scale = 3
+      })
+    end
+  end
+
+  return variations
 end
 
 return fire_util
