@@ -47,6 +47,50 @@ local add_to_tracked_items = function()
 
 end
 
+local call_nuke = function(surface, position, source)
+
+  --position = {x = 16 + (32 * math.floor(position.x / 32)), y = 16 + (32 * math.floor(position.y / 32))}
+
+  surface.request_to_generate_chunks(position, 5)
+  --surface.force_generate_chunk_requests()
+
+  local source_position = source.position
+
+  local create_entity = surface.create_entity
+
+  local target = create_entity
+  {
+    name = mirv_target,
+    position = position,
+    force = "neutral"
+  }
+
+  local offset = ((position.x - source_position.x) / 2)
+  offset = math.min(offset, 2000)
+  offset = math.max(offset, -2000)
+
+  local projectile = create_entity
+  {
+    name = mirv_projectile,
+    position = {position.x - offset, target.position.y - 2500},
+    force = source.force,
+    target = target,
+    speed = math.random(500, 650) / 100
+  }
+
+  for k, player in pairs (game.connected_players) do
+    if player.surface == surface then
+      player.add_custom_alert(target, custom_alert, alert_message, true)
+    end
+  end
+
+  surface.play_sound(alert_sound)
+
+  surface.create_trivial_smoke{name = mirv_smoke, position = position}
+  surface.create_trivial_smoke{name = mirv_smoke_2, position = position}
+
+end
+
 local mirv_script_trigger = function(event)
 
   local source = event.source_entity
@@ -65,47 +109,7 @@ local mirv_script_trigger = function(event)
     --game.print("Killed flare "..k)
   end
 
-
-  --position = {x = 16 + (32 * math.floor(position.x / 32)), y = 16 + (32 * math.floor(position.y / 32))}
-
-  surface.request_to_generate_chunks(position, 5)
-  --surface.force_generate_chunk_requests()
-
-  local create_entity = surface.create_entity
-
-  local target = create_entity
-  {
-    name = mirv_target,
-    position = position,
-    force = "neutral"
-  }
-
-  local source_position = source.position
-
-  local offset = ((position.x - source_position.x) / 2)
-  offset = math.min(offset, 2000)
-  offset = math.max(offset, -2000)
-
-  local projectile = create_entity
-  {
-    name = mirv_projectile,
-    position = {position.x - offset, target.position.y - 2000},
-    force = source.force,
-    target = target,
-    speed = math.random(500, 650) / 100
-  }
-
-  for k, player in pairs (game.connected_players) do
-    if player.surface == surface then
-      player.add_custom_alert(target, custom_alert, alert_message, true)
-    end
-  end
-
-  surface.play_sound(alert_sound)
-
-  surface.create_trivial_smoke{name = mirv_smoke, position = position}
-  surface.create_trivial_smoke{name = mirv_smoke_2, position = position}
-
+  call_nuke(surface, position, source)
 
   local item_count = source.get_item_count("mirv-ammo")
   if item_count == 1 then
@@ -123,8 +127,8 @@ local mirv_pollute_trigger = function(event)
   local surface = game.get_surface(event.surface_index)
   if not surface then return end
 
-  surface.pollute(position, 1000)
-  game.pollution_statistics.on_flow(launcher, 1000)
+  surface.pollute(position, 666)
+  game.pollution_statistics.on_flow(launcher, 666)
 end
 
 local on_script_trigger_effect = function(event)
@@ -139,6 +143,11 @@ local on_script_trigger_effect = function(event)
   end
 
 end
+
+remote.add_interface("mirv",
+{
+  call_nuke = call_nuke
+})
 
 local lib = {}
 

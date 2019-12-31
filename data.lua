@@ -178,8 +178,9 @@ local turret =
 {
   type = "artillery-turret",
   name = "mirv-launcher",
-  icon = "__base__/graphics/icons/artillery-turret.png",
-  icon_size = 64, icon_mipmaps = 4,
+  localised_name = {"item-name.mirv-rocket"},
+  icon = "__MIRV__/mirv_rocket.png",
+  icon_size = 32,
   flags = {"placeable-neutral", "placeable-player", "player-creation"},
 
   --collision_box = {{-1.45, -1.45}, {1.45, 1.45}},
@@ -206,6 +207,7 @@ local gun =
 {
   type = "gun",
   name = "mirv-launcher-gun",
+  localised_name = {"item-name.mirv-rocket"},
   icon = "__base__/graphics/icons/tank-cannon.png",
   icon_size = 64, icon_mipmaps = 4,
   flags = {"hidden"},
@@ -393,28 +395,6 @@ local fiery_particle =
 
 data:extend{fiery_particle}
 
-local scorchmark =
-{
-  type = "corpse",
-  name = "nuke-scorchmark",
-  icon = "__base__/graphics/icons/small-scorchmark.png",
-  icon_size = 64, icon_mipmaps = 4,
-  flags = {"placeable-neutral", "not-on-map", "placeable-off-grid"},
-  collision_box = {{-1.5, -1.5}, {1.5, 1.5}},
-  collision_mask = {"doodad-layer", "not-colliding-with-itself"},
-  selection_box = {{-1, -1}, {1, 1}},
-  selectable_in_game = false,
-  time_before_removed = 60 * 60 * 5,
-  final_render_layer = "ground-patch-higher2",
-  subgroup = "remnants",
-  order="d[remnants]-b[scorchmark]-a[small]",
-  remove_on_entity_placement = false,
-  remove_on_tile_placement = true,
-  animation = fire_util.create_burnt_patch_pictures()
-}
-
-data:extend{scorchmark}
-
 local pictures = fire_util.create_fire_pictures({scale = 3, shift = {0, 3}})
 
 
@@ -481,7 +461,7 @@ for k, picture in pairs (pictures) do
             action =
             {
               type = "area",
-              radius = 10.0,
+              radius = 5.0,
               action_delivery =
               {
                 type = "instant",
@@ -498,7 +478,7 @@ for k, picture in pairs (pictures) do
           {
 
             type = "create-particle",
-            repeat_count = 1,
+            repeat_count = 3,
             particle_name = "fiery-particle",
             initial_height = 0.1,
             --speed_from_center = 0.08,
@@ -599,8 +579,8 @@ local remote =
 {
   type = "capsule",
   name = "mirv-targeting-remote",
-  icon = "__base__/graphics/icons/artillery-targeting-remote.png",
-  icon_size = 64, icon_mipmaps = 4,
+  icon = "__MIRV__/mirv-targeting-remote.png",
+  icon_size = 64,
   capsule_action =
   {
     type = "artillery-remote",
