@@ -541,12 +541,23 @@ local projectile =
         width = 64,
         height = 64,
         priority = "high",
-        scale = 1
+        scale = 1,
+        shift = {0.05, -0.5}
       },
       {
-        filename = "__MIRV__/mirv_rocket.png",
-        width = 32,
-        height = 32,
+        filename = "__base__/graphics/entity/artillery-projectile/artillery-shoot-map-visualization.png",
+        flags = { "icon" },
+        frame_count = 1,
+        width = 64,
+        height = 64,
+        priority = "high",
+        scale = 0.5,
+        shift = {0.05, -0.8}
+      },
+      {
+        filename = "__MIRV__/mirv_projectile.png",
+        width = 64,
+        height = 64,
         scale = 0.5,
         frame_count = 1
       }
@@ -560,7 +571,8 @@ local projectile =
     height = 300,
     scale = 0.5,
     shift = util.by_pixel(-4, -28),
-    hr_version = {
+    hr_version =
+    {
       filename = "__base__/graphics/entity/rocket-silo/hr-02-rocket.png",
       width = 310,
       height = 596,
@@ -572,8 +584,8 @@ local projectile =
   {
     filename = "__base__/graphics/entity/rocket/rocket-shadow.png",
     frame_count = 1,
-    width = 7,
-    height = 24,
+    width = 1,
+    height = 1,
     priority = "high",
     shift = {0, 0}
   }

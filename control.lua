@@ -1,4 +1,4 @@
-local custom_alert = {type = "item", name = "mirv-rocket"}
+local custom_alert = {type = "item", name = "mirv-targeting-remote"}
 local alert_message = {"launch-detected"}
 local alert_sound = {path = "entity-build/mirv-target"}
 local mirv_item = "mirv-rocket"
@@ -121,13 +121,23 @@ local mirv_script_trigger = function(event)
 
 end
 
+local offsets =
+{
+  {8, 8},
+  {-8, -8},
+  {-8, 8},
+  {8, -8}
+}
+
 local mirv_pollute_trigger = function(event)
   local position = event.target_position
   if not position then return end
   local surface = game.get_surface(event.surface_index)
   if not surface then return end
 
-  surface.pollute(position, 666)
+  for k, offset in pairs (offsets) do
+    surface.pollute({position.x + offset[1], position.y + offset[2]}, 666/#offsets)
+  end
   game.pollution_statistics.on_flow(launcher, 666)
 end
 
