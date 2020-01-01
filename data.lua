@@ -193,7 +193,7 @@ local turret =
   gun = "mirv-launcher-gun",
   turret_rotation_speed = 1,
   manual_range_modifier = 1000000,
-  disable_automatic_firing = false,
+  disable_automatic_firing = not settings.startup["mirv-auto-launch"].value,
 
   base_picture = util.empty_sprite(),
   cannon_barrel_pictures = util.empty_sprite(),
@@ -299,12 +299,16 @@ local nuke_target_effects =
         }
       }
     }
-  },
+  }
+}
+
+if settings.startup["mirv-pollution-on-detonation"].value then
+  table.insert(nuke_target_effects,
   {
     type = "script",
     effect_id = "mirv-pollute"
-  }
-}
+  })
+end
 
 local do_whacka_do = function()
   local watra = 1 + ((math.random() - 0.5))
