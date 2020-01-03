@@ -51,7 +51,7 @@ local call_nuke = function(surface, position, source)
 
   --position = {x = 16 + (32 * math.floor(position.x / 32)), y = 16 + (32 * math.floor(position.y / 32))}
 
-  surface.request_to_generate_chunks(position, 5)
+  surface.request_to_generate_chunks(position, 4)
   --surface.force_generate_chunk_requests()
 
   local source_position = source.position
@@ -66,16 +66,16 @@ local call_nuke = function(surface, position, source)
   }
 
   local offset = ((position.x - source_position.x) / 2)
-  offset = math.min(offset, 2000)
-  offset = math.max(offset, -2000)
+  offset = math.min(offset, 1000)
+  offset = math.max(offset, -1000)
 
   local projectile = create_entity
   {
     name = mirv_projectile,
-    position = {position.x - offset, target.position.y - 2500},
+    position = {position.x - offset, target.position.y - 1250},
     force = source.force,
     target = target,
-    speed = math.random(500, 650) / 100
+    speed = math.random(500, 650) / 200
   }
 
   for k, player in pairs (game.connected_players) do

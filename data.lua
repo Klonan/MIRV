@@ -399,9 +399,77 @@ local fiery_particle =
 
 data:extend{fiery_particle}
 
+local make_scorchmark = function(name)
+  local scale = math.random(50, 250) / 100
+  data:extend
+  {
+    {
+      type = "corpse",
+      name = name,
+      icon = "__base__/graphics/icons/small-scorchmark.png",
+      icon_size = 64, icon_mipmaps = 4,
+      flags = {"placeable-neutral", "not-on-map", "placeable-off-grid"},
+      collision_box = {{-1.5, -1.5}, {1.5, 1.5}},
+      collision_mask = {"doodad-layer", "not-colliding-with-itself"},
+      selection_box = {{-1, -1}, {1, 1}},
+      selectable_in_game = false,
+      time_before_removed = 60 * 60 * (scale + 2),
+      final_render_layer = "ground-patch-higher2",
+      subgroup = "remnants",
+      order="d[remnants]-b[scorchmark]-a[small]",
+      remove_on_entity_placement = false,
+      remove_on_tile_placement = true,
+      animation =
+      {
+        width = 110,
+        height = 90,
+        frame_count = 1,
+        direction_count = 1,
+        filename = "__base__/graphics/entity/scorchmark/small-scorchmark.png",
+        scale = scale
+      },
+      ground_patch =
+      {
+        sheet =
+        {
+          width = 110,
+          height = 90,
+          frame_count = 1,
+          x = 110 * 2,
+          filename = "__base__/graphics/entity/scorchmark/small-scorchmark.png",
+          variation_count = 3,
+          scale = scale
+        }
+      },
+      ground_patch_higher =
+      {
+        sheet =
+        {
+          width = 110,
+          height = 90,
+          frame_count = 1,
+          x = 110,
+          filename = "__base__/graphics/entity/scorchmark/small-scorchmark.png",
+          variation_count = 3,
+          scale = scale
+        }
+      }
+    }
+  }
+  return name
+end
+
 local pictures = fire_util.create_fire_pictures({scale = 3, shift = {0, 3}})
 
-
+local make_fire = function(name)
+  local fire = util.copy(data.raw.fire["fire-flame"])
+  fire.name = name
+  fire.initial_lifetime = math.random(5, 20) * 60
+  fire.collision_box = {{-1.5, -1.5}, {1.5, 1.5}}
+  fire.collision_mask = {"doodad-layer", "not-colliding-with-itself"}
+  data:extend{fire}
+  return name
+end
 
 local total = #pictures
 local proj_count = math.ceil(2000 / total)
@@ -472,9 +540,16 @@ for k, picture in pairs (pictures) do
                 target_effects =
                 {
                   {
+                    type = "create-fire",
+                    entity_name = make_fire("nuke-fire"..k),
+                    initial_ground_flame_count = math.random(10, 20),
+                    check_buildability = true,
+                    probability = 0.1
+                  },
+                  {
                     type = "damage",
                     damage = {amount = 2000 , type = "physical"}
-                  }
+                  },
                 }
               }
             }
@@ -500,11 +575,18 @@ for k, picture in pairs (pictures) do
             type = "create-entity",
             entity_name = "nuke-explosion"
           },
-          --{
-          --  type = "create-entity",
-          --  entity_name = "nuke-scorchmark",
-          --  offset_deviation = {{-4, -4},{4, 4}}
-          --},
+          {
+            type = "create-entity",
+            entity_name = make_scorchmark("nuke-scorchmark"..k.."1"),
+            check_buildability = true,
+            offset_deviation = {{-4, -4},{4, 4}}
+          },
+          {
+            type = "create-entity",
+            entity_name = make_scorchmark("nuke-scorchmark"..k.."2"),
+            check_buildability = true,
+            offset_deviation = {{-4, -4},{4, 4}}
+          }
         }
       }
     }
