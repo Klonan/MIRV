@@ -144,7 +144,7 @@ end
 util.empty_sound = function()
   return
   {
-    filename = util.path("data/tf_util/empty-sound.ogg"),
+    filename = util.path("tf_util/empty-sound.ogg"),
     volume = 0
   }
 end
@@ -152,7 +152,7 @@ end
 util.empty_sprite = function()
   return
   {
-    filename = util.path("data/tf_util/empty-sprite.png"),
+    filename = util.path("tf_util/empty-sprite.png"),
     height = 1,
     width = 1,
     frame_count = 1,
