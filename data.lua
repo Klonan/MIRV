@@ -419,39 +419,50 @@ local make_scorchmark = function(name)
       order="d[remnants]-b[scorchmark]-a[small]",
       remove_on_entity_placement = false,
       remove_on_tile_placement = true,
-      animation =
-      {
-        width = 110,
-        height = 90,
-        frame_count = 1,
-        direction_count = 1,
-        filename = "__base__/graphics/entity/scorchmark/small-scorchmark.png",
-        scale = scale
-      },
       ground_patch =
       {
         sheet =
         {
-          width = 110,
-          height = 90,
-          frame_count = 1,
-          x = 110 * 2,
           filename = "__base__/graphics/entity/scorchmark/small-scorchmark.png",
-          variation_count = 3,
-          scale = scale
+          width = 128,
+          height = 92,
+          line_length = 4,
+          shift = util.by_pixel(0, 2),
+          variation_count = 4,
+          scale = scale,
+          hr_version =
+          {
+            filename = "__base__/graphics/entity/scorchmark/hr-small-scorchmark.png",
+            width = 256,
+            height = 182,
+            line_length = 4,
+            shift = util.by_pixel(0, 2),
+            variation_count = 4,
+            scale = scale / 2,
+          }
         }
       },
       ground_patch_higher =
       {
         sheet =
         {
-          width = 110,
-          height = 90,
-          frame_count = 1,
-          x = 110,
-          filename = "__base__/graphics/entity/scorchmark/small-scorchmark.png",
-          variation_count = 3,
-          scale = scale
+          filename = "__base__/graphics/entity/scorchmark/small-scorchmark-top.png",
+          width = 34,
+          height = 28,
+          line_length = 4,
+          variation_count = 4,
+          shift = util.by_pixel(0, -2),
+          scale = scale,
+          hr_version =
+          {
+            filename = "__base__/graphics/entity/scorchmark/hr-small-scorchmark-top.png",
+            width = 68,
+            height = 54,
+            line_length = 4,
+            shift = util.by_pixel(0, -2),
+            variation_count = 4,
+            scale = 0.5 * scale,
+          }
         }
       }
     }
