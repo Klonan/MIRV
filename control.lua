@@ -39,14 +39,6 @@ local on_rocket_launched = function(event)
 
 end
 
-local add_to_tracked_items = function()
-
-  if remote.interfaces["silo_script"] then
-    remote.call("silo_script", "add_tracked_item", "mirv-rocket")
-  end
-
-end
-
 local call_nuke = function(surface, position, source)
 
   --position = {x = 16 + (32 * math.floor(position.x / 32)), y = 16 + (32 * math.floor(position.y / 32))}
@@ -169,11 +161,10 @@ lib.events =
 }
 
 lib.on_init = function()
-  add_to_tracked_items()
 end
 
 lib.on_configuration_changed = function()
-  add_to_tracked_items()
+
 end
 
 local handler = require("event_handler")
