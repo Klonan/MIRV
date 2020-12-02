@@ -764,3 +764,8 @@ data:extend
   nuke_explosion
 
 }
+
+local artillery_flare = data.raw["artillery-flare"]["artillery-flare"]
+if artillery_flare then
+  artillery_flare.shot_category = artillery_flare.shot_category or "artillery-shell"
+end
